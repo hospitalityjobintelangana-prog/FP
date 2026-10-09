@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Function Prospectus – Parivaar Catering by Focus Prism</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Arial,Calibri,sans-serif;font-size:13px;color:#111;background:#e9ecef}
+  .toolbar{position:sticky;top:0;z-index:10;background:#1f2a44;color:#fff;padding:8px 12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .toolbar button,.toolbar select{font:inherit;padding:6px 10px;border:0;border-radius:4px;cursor:pointer}
+  .toolbar button{background:#fff;color:#1f2a44;font-weight:600}
+  .toolbar button.pri{background:#f5b301}
+  .toolbar .sp{flex:1}
+  .toolbar select{max-width:200px}
+  .page{width:210mm;max-width:100%;margin:12px auto;background:#fff;padding:12mm 12mm 10mm;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+  .brand{text-align:center;border-bottom:2px solid #000;padding-bottom:6px}
+  .brand .co{font-size:22px;font-weight:700;letter-spacing:.5px}
+  .brand .by{font-size:12px;color:#444}
+  .brand .ttl{font-size:20px;font-weight:700;margin-top:4px}
+  .idrow{display:flex;justify-content:flex-end;align-items:center;gap:6px;margin:6px 0 0}
+  .idrow label{font-weight:700}
+  .idrow input{width:170px;font-weight:700;border:1px solid #888;padding:4px 6px;font-size:13px;text-align:center}
+  h2{font-size:13px;text-transform:uppercase;text-align:center;margin:12px 0 5px}
+  h2 input{font:inherit;font-weight:700;text-transform:uppercase;text-align:center;border:0;background:transparent;width:60%}
+  .grid{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #777;border-left:1px solid #777}
+  .f{display:flex;border-right:1px solid #777;border-bottom:1px solid #777;min-height:26px}
+  .f input{border:0;padding:4px 6px;font:inherit;background:transparent;min-width:0}
+  .f .lab{width:40%;font-weight:700;background:#f2f2f2;border-right:1px solid #999}
+  .f .val{flex:1}
+  button.x,button.mini{border:0;background:transparent;color:#b00;cursor:pointer;font-size:14px;padding:0 5px}
+  button.add{margin-top:4px;font-size:12px;padding:3px 8px;border:1px dashed #666;background:#fafafa;border-radius:3px;cursor:pointer}
+  table{border-collapse:collapse;width:100%}
+  th,td{border:1px solid #777;padding:0;vertical-align:top}
+  th{background:#d9d9d9;text-align:left;padding:4px 6px;font-size:12px}
+  td input.cat{width:100%;border:0;padding:5px 6px;font:inherit;font-weight:700;background:#f2f2f2;text-transform:uppercase}
+  td textarea{width:100%;border:0;padding:5px 6px;font:inherit;resize:none;overflow:hidden;display:block;background:transparent}
+  td.act{width:70px;text-align:center;white-space:nowrap}
+  .sig{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #777;border-left:1px solid #777;margin-top:4px}
+  .sig>div{border-right:1px solid #777;border-bottom:1px solid #777}
+  .sig input{width:100%;border:0;border-bottom:1px solid #999;background:#f2f2f2;font:inherit;font-weight:700;text-align:center;padding:5px}
+  .sig .box{height:70px;display:flex;align-items:flex-end;padding:4px 6px;font-size:11px}
+  .appr{font-weight:700;margin:14px 0 4px;font-size:13px}
+  .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#1f2a44;color:#fff;padding:8px 16px;border-radius:6px;opacity:0;transition:.3s;pointer-events:none}
+  .toast.show{opacity:1}
+  table.pay td{padding:0}
+  table.pay td.l{background:#f2f2f2;font-weight:700;padding:5px 6px;width:34%}
+  table.pay td.o{padding:5px 8px;text-align:right;font-weight:700}
+  table.pay td.sub{background:#d9d9d9;font-weight:700;padding:4px 6px;font-size:12px}
+  table.pay input,table.pay select{border:0;border-bottom:1px solid #bbb;padding:4px 6px;font:inherit;background:transparent;min-width:0}
+  table.pay .flex{display:flex;gap:6px;padding:3px 6px;align-items:center}
+  table.pay .flex input{flex:1}
+  table.pay tr.tot td{background:#eef3ff}
+  table.pay tr.bal td{background:#fff3cd;font-size:15px;font-weight:700;padding:7px 8px}
+  table.pay tr.bal td.o{font-size:16px}
+  .hint{font-size:11px;color:#777;margin-left:6px}
+  @media print{
+    @page{size:A4 portrait;margin:8mm}
+    body{background:#fff}
+    .toolbar,.no-print,button,.toast{display:none!important}
+    .page{box-shadow:none;margin:0;padding:0;width:auto}
+    .f input,td textarea,td input.cat{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .f .lab,th,td input.cat,.sig input{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+  @media(max-width:700px){.grid{grid-template-columns:1fr}.page{padding:8px}.sig{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <button onclick="newBlank()">＋ New Blank</button>
+  <button onclick="loadSample()">Load Sample</button>
+  <button class="pri" onclick="saveDoc()">💾 Save</button>
+  <select id="saved"></select>
+  <button onclick="openDoc()">Open</button>
+  <button onclick="deleteDoc()">Delete</button>
+  <span class="sp"></span>
+  <button onclick="exportWord()">⬇ Word</button>
+  <button onclick="exportExcel()">⬇ Excel</button>
+  <button onclick="exportJSON()">⬇ JSON</button>
+  <button onclick="document.getElementById('imp').click()">⬆ Import JSON</button>
+  <input type="file" id="imp" accept=".json" style="display:none" onchange="importJSON(event)">
+  <button onclick="window.print()">🖨 Print / PDF</button>
+</div>
+
+<div class="page" id="page"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const COMPANY = 'Parivaar Catering';
+const BYLINE = 'by Focus Prism';
+const KEY_DOCS = 'fp_prospectus_docs', KEY_CTR = 'fp_prospectus_counter';
+let S = null;
+
+const f = (l, v = '', extra = {}) => Object.assign({ l, v }, extra);
+
+function payDefault() {
+  return { basis: 'confirmed', customPax: '', rate: '', extras: [], discount: '', scPct: '0', gstPct: '18', advances: [] };
+}
+
+function nextFpId() {
+  const d = new Date();
+  const ym = String(d.getFullYear()) + String(d.getMonth() + 1).padStart(2, '0');
+  let c = parseInt(localStorage.getItem(KEY_CTR) || '0', 10) + 1;
+  localStorage.setItem(KEY_CTR, c);
+  return 'FP-' + ym + '-' + String(c).padStart(4, '0');
+}
+
+function blankDoc() {
+  return {
+    fpId: nextFpId(),
+    menuTitle: 'VEG MENU',
+    info: [
+      f('Confirmed Pax'), f('Expected Pax'), f('Rate'), f('Customer Name'),
+      f('Customer Address'), f('Contact No.'), f('Email'), f('Reference'),
+      f('Date', '', { type: 'date', key: 'date' }), f('Day', '', { key: 'day' }),
+      f('Venue'), f('Timings'), f('Meal Period')
+    ],
+    sched: [
+      f('AMT'), f('LUNCH'), f('PMT'), f('Type of Function'),
+      f('Advance Details'), f('Mode of Payment'), f('Stage Size'), f('Seating Style')
+    ],
+    pkg: [
+      f('Package Cycle Starts With'), f('Package Cycle Ends With'), f('Head Table'), f('Audio Visuals')
+    ],
+    menu: ['TEA/COFFEE','SOUP','SALAD','VEG CURRY','FLAVOURED RICE','DAL','INDIAN BREADS','DESSERT','ICE-CREAM','COMMON ITEMS','FNB','FNB PRODUCTION'].map(c => ({ c, i: '' })),
+    instr: [{ c: 'Tea/Coffee', i: '' }, { c: 'Flavoured Rice', i: '' }, { c: 'Dessert', i: '' }, { c: 'Lunch', i: '' }, { c: 'Other', i: '' }],
+    sigs: ['Banquet Coordinator', 'F&B Manager', 'Chef', 'VP'],
+    pay: payDefault()
+  };
+}
+
+function sampleDoc() {
+  const d = blankDoc();
+  const set = (arr, label, v) => { const x = arr.find(o => o.l === label); if (x) x.v = v; };
+  set(d.info, 'Confirmed Pax', '60'); set(d.info, 'Expected Pax', '70'); set(d.info, 'Rate', '₹560++');
+  set(d.info, 'Customer Name', 'LIC'); set(d.info, 'Reference', 'MR ROY');
+  set(d.info, 'Date', '2023-09-25'); set(d.info, 'Day', 'MONDAY');
+  set(d.info, 'Venue', 'PATIO'); set(d.info, 'Timings', '9 AM TO 6 PM'); set(d.info, 'Meal Period', 'LUNCH');
+  set(d.sched, 'AMT', '10:30 AM'); set(d.sched, 'LUNCH', '1:00 PM'); set(d.sched, 'PMT', '4:00 PM');
+  set(d.sched, 'Type of Function', 'CONFERENCE'); set(d.sched, 'Mode of Payment', 'BTC'); set(d.sched, 'Seating Style', 'CLUSTER');
+  set(d.pkg, 'Package Cycle Starts With', 'AMT'); set(d.pkg, 'Package Cycle Ends With', 'PMT'); set(d.pkg, 'Audio Visuals', 'NO AUDIO VISUALS');
+  const m = {
+    'TEA/COFFEE': '2 TIMES TEA/COFFEE WITH BISCUITS', 'SOUP': 'VEG MANCHOW SOUP', 'SALAD': 'GREEN SALAD, RUSSIAN SALAD',
+    'VEG CURRY': 'MIX VEG CURRY WITH PANEER, BHENDI DO PYAZA', 'FLAVOURED RICE': 'PEAS PULAO', 'DAL': 'DAL TADKA',
+    'INDIAN BREADS': 'NAAN, ROTI', 'DESSERT': 'GULAB JAMUN', 'ICE-CREAM': 'VANILLA',
+    'COMMON ITEMS': 'STEAM RICE, SAMBAR, CURD, PAPAD, PICKLE, RAITHA, SALAN',
+    'FNB': 'WHITE BOARD, MARKER, PAD, PENCIL, WATER BOTTLES INSIDE OF THE HALL'
+  };
+  d.menu.forEach(r => { if (m[r.c]) r.i = m[r.c]; });
+  d.instr[0].i = 'Replace cookies with biscuits (Monaco and Marie biscuits)';
+  d.instr[1].i = 'Sona Masoori';
+  return d;
+}
+
+/* ---------- helpers ---------- */
+const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+function toast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 1800); }
+function fmtDate(iso) { if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso || ''; const [y, m, d] = iso.split('-'); return d + '/' + m + '/' + y; }
+function dayName(iso) { const d = new Date(iso + 'T00:00:00'); return isNaN(d) ? '' : d.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase(); }
+function showVal(o) { return o.type === 'date' ? fmtDate(o.v) : o.v; }
+function autosize(t) { t.style.height = 'auto'; t.style.height = (t.scrollHeight + 2) + 'px'; }
+
+/* ---------- render ---------- */
+function render() {
+  if (!S.pay) S.pay = payDefault();
+  const p = document.getElementById('page');
+  p.innerHTML = '';
+  const head = document.createElement('div');
+  head.innerHTML = `<div class="brand"><div class="co">${COMPANY}</div><div class="by">${BYLINE}</div><div class="ttl">FUNCTION PROSPECTUS</div></div>
+    <div class="idrow"><label>FP ID:</label><input id="fpid" value="${esc(S.fpId)}"><button class="no-print mini" title="Generate new FP ID" onclick="regenId()" style="color:#1f2a44">↻</button></div>`;
+  p.appendChild(head);
+  head.querySelector('#fpid').oninput = e => S.fpId = e.target.value;
+
+  section(p, 'Customer & Function Information', 'info');
+  section(p, 'Function Schedule & Details', 'sched');
+  section(p, 'Package & Technical Requirements', 'pkg');
+  rowsTable(p, 'menu', true);
+  rowsTable(p, 'instr', false);
+  paySection(p);
+
+  const a = document.createElement('div'); a.className = 'appr'; a.textContent = 'APPROVALS'; p.appendChild(a);
+  const sg = document.createElement('div'); sg.className = 'sig';
+  S.sigs.forEach((n, i) => {
+    const c = document.createElement('div');
+    c.innerHTML = `<input value="${esc(n)}"><div class="box">Signature: ____________</div>`;
+    c.querySelector('input').oninput = e => S.sigs[i] = e.target.value;
+    sg.appendChild(c);
+  });
+  p.appendChild(sg);
+  p.querySelectorAll('textarea').forEach(autosize);
+}
+
+function section(parent, title, key) {
+  const h = document.createElement('h2'); h.textContent = title; parent.appendChild(h);
+  const g = document.createElement('div'); g.className = 'grid';
+  S[key].forEach((o, i) => {
+    const c = document.createElement('div'); c.className = 'f';
+    c.innerHTML = `<input class="lab" value="${esc(o.l)}"><input class="val" type="${o.type === 'date' ? 'date' : 'text'}" value="${esc(o.v)}"><button class="x no-print" title="Remove field">×</button>`;
+    c.querySelector('.lab').oninput = e => o.l = e.target.value;
+    const val = c.querySelector('.val');
+    val.oninput = e => {
+      o.v = e.target.value;
+      if (o.key === 'date') {
+        const dn = S.info.find(x => x.key === 'day');
+        if (dn) { dn.v = dayName(o.v); render(); }
+      }
+    };
+    c.querySelector('.x').onclick = () => { S[key].splice(i, 1); render(); };
+    g.appendChild(c);
+  });
+  parent.appendChild(g);
+  const b = document.createElement('button'); b.className = 'add no-print'; b.textContent = '+ Add field';
+  b.onclick = () => { S[key].push(f('New Field')); render(); };
+  parent.appendChild(b);
+}
+
+function rowsTable(parent, key, isMenu) {
+  const h = document.createElement('h2');
+  if (isMenu) { h.innerHTML = `<input value="${esc(S.menuTitle)}">`; h.querySelector('input').oninput = e => S.menuTitle = e.target.value; }
+  else h.textContent = 'Special Instructions';
+  parent.appendChild(h);
+  const t = document.createElement('table');
+  t.innerHTML = `<tr><th style="width:28%">${isMenu ? 'MENU CATEGORY' : 'ITEM / SECTION'}</th><th>${isMenu ? 'MENU ITEMS / DESCRIPTION' : 'INSTRUCTION'}</th><th class="no-print act" style="width:70px"></th></tr>`;
+  S[key].forEach((r, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><input class="cat" value="${esc(r.c)}"></td><td><textarea rows="1">${esc(r.i)}</textarea></td>
+
+```
+  <td class="act no-print"><button class="mini" style="color:#333" title="Move up">↑</button><button class="mini" style="color:#333" title="Move down">↓</button><button class="mini" title="Delete row">×</button></td>`;
+tr.querySelector('input').oninput = e => r.c = e.target.value;
+const ta = tr.querySelector('textarea');
+ta.oninput = e => { r.i = e.target.value; autosize(ta); };
+const [up, dn, del] = tr.querySelectorAll('button');
+up.onclick = () => { if (i > 0) { [S[key][i - 1], S[key][i]] = [S[key][i], S[key][i - 1]]; render(); } };
+dn.onclick = () => { if (i < S[key].length - 1) { [S[key][i + 1], S[key][i]] = [S[key][i], S[key][i + 1]]; render(); } };
+del.onclick = () => { S[key].splice(i, 1); render(); };
+t.appendChild(tr);
+```
+
+});
+parent.appendChild(t);
+const b = document.createElement(‘button’); b.className = ‘add no-print’; b.textContent = ‘+ Add row’;
+b.onclick = () => { S[key].push({ c: ‘’, i: ‘’ }); render(); };
+parent.appendChild(b);
+}
+
+/* ––––– payment ––––– */
+function num(s) { const n = parseFloat(String(s == null ? ‘’ : s).replace(/[^0-9.-]/g, ‘’)); return isNaN(n) ? 0 : n; }
+const inr = n => ‘₹’ + (n || 0).toLocaleString(‘en-IN’, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+function infoVal(label) { const o = S.info.find(x => x.l.trim().toLowerCase() === label.toLowerCase()); return o ? o.v : ‘’; }
+function payCalc() {
+const P = S.pay;
+const pax = P.basis === ‘custom’ ? num(P.customPax) : num(infoVal(P.basis === ‘expected’ ? ‘Expected Pax’ : ‘Confirmed Pax’));
+const rate = P.rate !== ‘’ ? num(P.rate) : num(infoVal(‘Rate’));
+const base = pax * rate;
+const extras = P.extras.reduce((a, x) => a + num(x.a), 0);
+const disc = num(P.discount);
+const taxable = Math.max(base + extras - disc, 0);
+const sc = taxable * num(P.scPct) / 100;
+const gst = (taxable + sc) * num(P.gstPct) / 100;
+const raw = taxable + sc + gst;
+const grand = Math.round(raw);
+const round = grand - raw;
+const adv = P.advances.reduce((a, x) => a + num(x.amt), 0);
+const bal = grand - adv;
+return { pax, rate, base, extras, disc, taxable, sc, gst, raw, round, grand, adv, bal };
+}
+function payLines() {
+const P = S.pay, c = payCalc();
+const basisLbl = { confirmed: ‘Confirmed Pax’, expected: ‘Expected Pax’, custom: ‘Actual / Custom Pax’ }[P.basis];
+const L = [[‘Pax basis’, basisLbl], [‘Pax used’, String(c.pax)], [‘Rate per pax’, inr(c.rate)], [‘Amount (Pax × Rate)’, inr(c.base)]];
+P.extras.forEach(x => L.push([’Add: ’ + (x.d || ‘Additional charge’), inr(num(x.a))]));
+if (c.disc) L.push([‘Less: Discount’, inr(-c.disc)]);
+L.push([‘Taxable Value’, inr(c.taxable)]);
+L.push([’Service Charge @ ’ + num(P.scPct) + ‘%’, inr(c.sc)]);
+L.push([’GST @ ’ + num(P.gstPct) + ‘%’, inr(c.gst)]);
+L.push([‘Round Off’, inr(c.round)]);
+L.push([‘GRAND TOTAL’, inr(c.grand)]);
+P.advances.forEach(x => L.push([‘Less: Advance ’ + [fmtDate(x.date), x.mode, x.ref].filter(Boolean).join(’ / ’), inr(-num(x.amt))]));
+L.push([‘Total Advance Received’, inr(c.adv)]);
+L.push([c.bal < 0 ? ‘EXCESS PAID (REFUNDABLE)’ : ‘BALANCE PAYABLE’, inr(Math.abs(c.bal))]);
+return L;
+}
+function updateCalc() {
+const c = payCalc(), set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+set(‘o_pax’, String(c.pax)); set(‘o_rate’, inr(c.rate)); set(‘o_base’, inr(c.base)); set(‘o_extras’, inr(c.extras));
+set(‘o_taxable’, inr(c.taxable)); set(‘o_sc’, inr(c.sc)); set(‘o_gst’, inr(c.gst));
+set(‘o_round’, inr(c.round)); set(‘o_grand’, inr(c.grand)); set(‘o_adv’, inr(c.adv));
+set(‘o_ballab’, c.bal < 0 ? ‘EXCESS PAID (REFUNDABLE)’ : ‘BALANCE PAYABLE’); set(‘o_bal’, inr(Math.abs(c.bal)));
+}
+function paySection(parent) {
+const P = S.pay;
+const h = document.createElement(‘h2’); h.textContent = ‘Payment Calculation’; parent.appendChild(h);
+const t = document.createElement(‘table’); t.className = ‘pay’;
+const row = (cls, html) => { const tr = document.createElement(‘tr’); if (cls) tr.className = cls; tr.innerHTML = html; t.appendChild(tr); return tr; };
+const bind = (el, obj, k) => { el.oninput = e => { obj[k] = e.target.value; updateCalc(); }; };
+
+let tr = row(’’, `<td class="l">Pax basis</td><td><div class="flex"><select><option value="confirmed">Confirmed Pax</option><option value="expected">Expected Pax</option><option value="custom">Actual / Custom Pax</option></select><input type="number" min="0" placeholder="Custom pax" style="max-width:120px"></div></td>`);
+const sel = tr.querySelector(‘select’), cp = tr.querySelector(‘input’);
+sel.value = P.basis; cp.value = P.customPax; cp.style.display = P.basis === ‘custom’ ? ‘’ : ‘none’;
+sel.onchange = e => { P.basis = e.target.value; cp.style.display = P.basis === ‘custom’ ? ‘’ : ‘none’; updateCalc(); };
+bind(cp, P, ‘customPax’);
+row(’’, `<td class="l">Pax used</td><td class="o" id="o_pax"></td>`);
+tr = row(’’, `<td class="l">Rate per pax (₹)</td><td><div class="flex"><input value="${esc(P.rate)}" placeholder="Blank = use Rate field above"><span class="hint no-print">e.g. 560</span></div></td>`);
+bind(tr.querySelector(‘input’), P, ‘rate’);
+row(’’, `<td class="l">Rate applied</td><td class="o" id="o_rate"></td>`);
+row(‘tot’, `<td class="l">Amount (Pax × Rate)</td><td class="o" id="o_base"></td>`);
+
+row(’’, `<td class="sub" colspan="2">ADDITIONAL CHARGES (extra items, AV, decoration, etc.)</td>`);
+P.extras.forEach((x, i) => {
+const r = row(’’, `<td colspan="2"><div class="flex"><input placeholder="Description" value="${esc(x.d)}"><input placeholder="Amount" style="max-width:140px;text-align:right" value="${esc(x.a)}"><button class="x no-print">×</button></div></td>`);
+const [a, b] = r.querySelectorAll(‘input’); bind(a, x, ‘d’); bind(b, x, ‘a’);
+r.querySelector(’.x’).onclick = () => { P.extras.splice(i, 1); render(); };
+});
+tr = row(‘no-print’, `<td colspan="2"><button class="add">+ Add charge</button></td>`);
+tr.querySelector(‘button’).onclick = () => { P.extras.push({ d: ‘’, a: ‘’ }); render(); };
+row(’’, `<td class="l">Additional charges total</td><td class="o" id="o_extras"></td>`);
+tr = row(’’, `<td class="l">Less: Discount (₹)</td><td><div class="flex"><input style="text-align:right" value="${esc(P.discount)}" placeholder="0"></div></td>`);
+bind(tr.querySelector(‘input’), P, ‘discount’);
+row(‘tot’, `<td class="l">Taxable Value</td><td class="o" id="o_taxable"></td>`);
+tr = row(’’, `<td class="l">Service Charge %</td><td><div class="flex"><input type="number" step="0.01" style="max-width:90px" value="${esc(P.scPct)}"><span class="o" id="o_sc" style="flex:1;text-align:right;font-weight:700"></span></div></td>`);
+bind(tr.querySelector(‘input’), P, ‘scPct’);
+tr = row(’’, `<td class="l">GST %</td><td><div class="flex"><input type="number" step="0.01" style="max-width:90px" value="${esc(P.gstPct)}"><span class="o" id="o_gst" style="flex:1;text-align:right;font-weight:700"></span></div></td>`);
+bind(tr.querySelector(‘input’), P, ‘gstPct’);
+row(’’, `<td class="l">Round Off</td><td class="o" id="o_round"></td>`);
+row(‘tot’, `<td class="l">GRAND TOTAL</td><td class="o" id="o_grand"></td>`);
+
+row(’’, `<td class="sub" colspan="2">ADVANCE PAYMENTS RECEIVED</td>`);
+P.advances.forEach((x, i) => {
+const r = row(’’, `<td colspan="2"><div class="flex"><input type="date" style="max-width:140px" value="${esc(x.date)}"><input placeholder="Mode (Cash/UPI/Cheque/BTC)" value="${esc(x.mode)}"><input placeholder="Ref / Receipt no." value="${esc(x.ref)}"><input placeholder="Amount" style="max-width:130px;text-align:right" value="${esc(x.amt)}"><button class="x no-print">×</button></div></td>`);
+const [d, m, rf, a] = r.querySelectorAll(‘input’);
+bind(d, x, ‘date’); bind(m, x, ‘mode’); bind(rf, x, ‘ref’); bind(a, x, ‘amt’);
+r.querySelector(’.x’).onclick = () => { P.advances.splice(i, 1); render(); };
+});
+tr = row(‘no-print’, `<td colspan="2"><button class="add">+ Add advance payment</button></td>`);
+tr.querySelector(‘button’).onclick = () => { P.advances.push({ date: ‘’, mode: ‘’, ref: ‘’, amt: ‘’ }); render(); };
+row(’’, `<td class="l">Total Advance Received</td><td class="o" id="o_adv"></td>`);
+row(‘bal’, `<td id="o_ballab"></td><td class="o" id="o_bal"></td>`);
+parent.appendChild(t);
+updateCalc();
+}
+function payHtml() {
+return ‘<h2>Payment Calculation</h2><table class="t">’ + payLines().map(r => {
+const strong = /TOTAL|BALANCE|EXCESS/.test(r[0]);
+return `<tr><td class="l" width="60%">${esc(r[0])}</td><td align="right" style="${strong ? 'font-weight:bold;background:#FFF3CD' : ''}">${esc(r[1])}</td></tr>`;
+}).join(’’) + ‘</table>’;
+}
+
+/* ––––– storage ––––– */
+function getDocs() { try { return JSON.parse(localStorage.getItem(KEY_DOCS) || ‘{}’); } catch (e) { return {}; } }
+function refreshSaved() {
+const sel = document.getElementById(‘saved’), docs = getDocs();
+sel.innerHTML = ‘<option value="">— Saved prospectuses —</option>’ +
+Object.keys(docs).sort().reverse().map(k => {
+const cust = (docs[k].info.find(x => x.l === ‘Customer Name’) || {}).v || ‘’;
+return `<option value="${esc(k)}">${esc(k)} ${cust ? '· ' + esc(cust) : ''}</option>`;
+}).join(’’);
+}
+function saveDoc() { const d = getDocs(); d[S.fpId] = JSON.parse(JSON.stringify(S)); localStorage.setItem(KEY_DOCS, JSON.stringify(d)); refreshSaved(); document.getElementById(‘saved’).value = S.fpId; toast(’Saved ’ + S.fpId); }
+function openDoc() { const k = document.getElementById(‘saved’).value; const d = getDocs(); if (k && d[k]) { S = JSON.parse(JSON.stringify(d[k])); render(); toast(’Opened ’ + k); } }
+function deleteDoc() { const k = document.getElementById(‘saved’).value; if (!k) return; if (!confirm(’Delete ’ + k + ‘?’)) return; const d = getDocs(); delete d[k]; localStorage.setItem(KEY_DOCS, JSON.stringify(d)); refreshSaved(); toast(’Deleted ’ + k); }
+function newBlank() { S = blankDoc(); render(); }
+function loadSample() { S = sampleDoc(); render(); }
+function regenId() { S.fpId = nextFpId(); render(); }
+
+function download(name, blob) {
+const a = document.createElement(‘a’); a.href = URL.createObjectURL(blob); a.download = name;
+document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+const safeName = () => (S.fpId || ‘prospectus’).replace(/[^\w-]+/g, ‘_’);
+
+function exportJSON() { download(safeName() + ‘.json’, new Blob([JSON.stringify(S, null, 2)], { type: ‘application/json’ })); }
+function importJSON(ev) {
+const file = ev.target.files[0]; if (!file) return;
+const r = new FileReader();
+r.onload = () => { try { const d = JSON.parse(r.result); if (!d.info || !d.menu) throw 0; S = d; render(); toast(‘Imported’); } catch (e) { alert(‘Invalid prospectus file’); } };
+r.readAsText(file); ev.target.value = ‘’;
+}
+
+/* ––––– Word export (opens in Word as editable tables) ––––– */
+function pairsHtml(arr) {
+let h = ‘<table class="t">’;
+for (let i = 0; i < arr.length; i += 2) {
+const a = arr[i], b = arr[i + 1];
+h += `<tr><td class="l">${esc(a.l)}</td><td>${esc(showVal(a))}&nbsp;</td>` +
+(b ? `<td class="l">${esc(b.l)}</td><td>${esc(showVal(b))}&nbsp;</td>` : ‘<td class="l"> </td><td> </td>’) + ‘</tr>’;
+}
+return h + ‘</table>’;
+}
+function rowsHtml(arr, h1, h2) {
+return `<table class="t"><tr><th width="28%">${h1}</th><th>${h2}</th></tr>` +
+arr.map(r => `<tr><td class="l">${esc(r.c)}</td><td>${esc(r.i).replace(/\n/g, '<br>')}&nbsp;</td></tr>`).join(’’) + ‘</table>’;
+}
+function exportWord() {
+const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>${esc(S.fpId)}</title>
+
+<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
+
+<style>@page Section1{size:21cm 29.7cm;margin:1.2cm}div.Section1{page:Section1}
+body{font-family:Arial;font-size:9.5pt}h2{font-size:11pt;text-align:center;text-transform:uppercase;margin:8pt 0 3pt}
+table.t{border-collapse:collapse;width:100%}table.t td,table.t th{border:1px solid #808080;padding:3pt 5pt;font-size:9.5pt}
+td.l{background:#F2F2F2;font-weight:bold}th{background:#D9D9D9;text-align:left}</style></head><body><div class="Section1">
+
+<p align="center" style="margin:0"><b style="font-size:18pt">${COMPANY}</b><br><span style="font-size:10pt">${BYLINE}</span></p>
+<p align="center" style="margin:2pt 0;border-bottom:2px solid #000"><b style="font-size:17pt">FUNCTION PROSPECTUS</b></p>
+<p align="right" style="margin:3pt 0"><b>FP ID: ${esc(S.fpId)}</b></p>
+<h2>Customer &amp; Function Information</h2>${pairsHtml(S.info)}
+<h2>Function Schedule &amp; Details</h2>${pairsHtml(S.sched)}
+<h2>Package &amp; Technical Requirements</h2>${pairsHtml(S.pkg)}
+<h2>${esc(S.menuTitle)}</h2>${rowsHtml(S.menu, 'MENU CATEGORY', 'MENU ITEMS / DESCRIPTION')}
+<h2>Special Instructions</h2>${rowsHtml(S.instr, 'ITEM / SECTION', 'INSTRUCTION')}
+${payHtml()}
+<p style="margin:10pt 0 3pt"><b>APPROVALS</b></p>
+<table class="t"><tr>${S.sigs.map(s => `<td class="l" align="center" width="25%">${esc(s)}</td>`).join('')}</tr>
+<tr>${S.sigs.map(() => '<td height="60" valign="bottom" style="font-size:8pt">Signature: ____________</td>').join('')}</tr></table>
+</div></body></html>`;
+  download(safeName() + '.doc', new Blob(['\ufeff', html], { type: 'application/msword' }));
+}
+
+/* ––––– Excel export ––––– */
+function exportExcel() {
+const aoa1 = [[‘Parivaar Catering – by Focus Prism’], [‘FUNCTION PROSPECTUS’], [‘FP ID’, S.fpId], []];
+const addSec = (title, arr) => { aoa1.push([title.toUpperCase()]); arr.forEach(o => aoa1.push([o.l, showVal(o)])); aoa1.push([]); };
+addSec(‘Customer & Function Information’, S.info);
+addSec(‘Function Schedule & Details’, S.sched);
+addSec(‘Package & Technical Requirements’, S.pkg);
+aoa1.push([‘APPROVALS’]); S.sigs.forEach(s => aoa1.push([s, ‘’]));
+const aoa2 = [[‘FP ID’, ‘Menu Category’, ‘Menu Items / Description’]].concat(S.menu.map(r => [S.fpId, r.c, r.i]));
+const aoa3 = [[‘FP ID’, ‘Item / Section’, ‘Instruction’]].concat(S.instr.map(r => [S.fpId, r.c, r.i]));
+const aoa4 = [[‘FP ID’, S.fpId], [‘PAYMENT CALCULATION’, ‘’]].concat(payLines());
+
+if (typeof XLSX === ‘undefined’) { // offline fallback
+const tb = a => ‘<table border="1">’ + a.map(r => ‘<tr>’ + r.map(c => `<td>${esc(c)}</td>`).join(’’) + ‘</tr>’).join(’’) + ‘</table>’;
+download(safeName() + ‘.xls’, new Blob([’\ufeff<html><meta charset="utf-8"><body>’ + tb(aoa1) + ‘<br>’ + tb(aoa2) + ‘<br>’ + tb(aoa3) + ‘<br>’ + tb(aoa4) + ‘</body></html>’], { type: ‘application/vnd.ms-excel’ }));
+return;
+}
+const wb = XLSX.utils.book_new();
+const s1 = XLSX.utils.aoa_to_sheet(aoa1); s1[’!cols’] = [{ wch: 34 }, { wch: 40 }];
+const s2 = XLSX.utils.aoa_to_sheet(aoa2); s2[’!cols’] = [{ wch: 18 }, { wch: 24 }, { wch: 70 }];
+const s3 = XLSX.utils.aoa_to_sheet(aoa3); s3[’!cols’] = [{ wch: 18 }, { wch: 24 }, { wch: 70 }];
+XLSX.utils.book_append_sheet(wb, s1, ‘Prospectus’);
+XLSX.utils.book_append_sheet(wb, s2, ‘Menu’);
+const s4 = XLSX.utils.aoa_to_sheet(aoa4); s4[’!cols’] = [{ wch: 44 }, { wch: 20 }];
+XLSX.utils.book_append_sheet(wb, s3, ‘Instructions’);
+XLSX.utils.book_append_sheet(wb, s4, ‘Payment’);
+XLSX.writeFile(wb, safeName() + ‘.xlsx’);
+}
+
+/* ––––– init ––––– */
+S = sampleDoc();
+refreshSaved();
+render();
+</script>
+
+</body>
+</html>
